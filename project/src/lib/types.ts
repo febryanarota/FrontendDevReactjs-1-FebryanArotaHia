@@ -3,7 +3,8 @@ export type Restaurant = {
     picture: string,
     category: string,
     price: number,
-    open: boolean
+    open: boolean,
+    rating: number
 }
 
 export type Review = {
