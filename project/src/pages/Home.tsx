@@ -95,11 +95,18 @@ export default function Home() {
             if (openOnly) {
                 data = data.filter((restaurant: Restaurant) => restaurant.open);
             }
-            setRestaurants(data)
+            
+            if (data !== "Not found") {
+                setRestaurants(data)
+                // setDisplay with 8 items
+                setDisplay(data.slice(0, 8))
+                setShowMore(data.length > 8)
+            } else {
+                setRestaurants([])
+                setDisplay([])
+                setShowMore(false)
+            }
             setLoading(false)
-            // setDisplay with 8 items
-            setDisplay(data.slice(0, 8))
-            setShowMore(data.length > 8)
         })
         .catch(error => {
             setError(error)
@@ -131,6 +138,14 @@ export default function Home() {
         setShowingAll(true);
     }
 
+    const getPriceBorderStyle = () => {
+        return price === "" ? "" : "border-sky-500 border-b-2";
+    };
+
+    const getCategoryBorderStyle = () => {
+        return category === "" ? "" : "border-sky-500 border-b-2";
+    }
+
     return (
         <div className="flex flex-col justify-center">
             <div>
@@ -148,13 +163,13 @@ export default function Home() {
                             <input onChange={openOnChange} type="checkbox" id="openNow" name="openNow" value="true"/>
                             <label htmlFor="openNow"> Open Now</label><br></br>
                         </div>
-                        <select name="price" id="price" onChange={priceOnChange}>
+                        <select name="price" id="price" onChange={priceOnChange} className={`bg-slate-50 ${getPriceBorderStyle()}`}>
                             <option value="">Price</option>
                             <option value="1">$</option>
                             <option value="2">$$</option>
                             <option value="3">$$$</option>
                         </select>
-                        <select name="category" id="category" onChange={categoryOnChange}>
+                        <select name="category" id="category" onChange={categoryOnChange} className={`bg-slate-50 ${getCategoryBorderStyle()}`}>
                             <option value="">Category</option>
                             <option value="Thai">Thai</option>
                             <option value="Italian">Italian</option>
@@ -175,10 +190,10 @@ export default function Home() {
 
                 <div className="grid md:grid-cols-4 grid-cols-2 gap-7 pb-20">
                     {
-                        !error && !loading && display.map((restaurant, index) => {
+                        !error && !loading &&  display.length > 0 && display.map((restaurant, index) => {
                             return (
                                 <Card
-                                    restaurant={restaurant}
+                                    restaurant={restaurant} key={index}
                                 />
                             )
                         
@@ -195,6 +210,15 @@ export default function Home() {
                 View More
                 </a>
             )}
+            {
+                loading && <p className="text-center self-center">Loading...</p>
+            }
+            {
+                error && <p className="text-center self-center">An error occured {error}</p>
+            }
+            {
+                !loading && !error && display.length === 0 && <p className="text-center self-center">No restaurants found</p>
+            }
         </div>
     );
 };
